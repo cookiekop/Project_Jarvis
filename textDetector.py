@@ -51,11 +51,17 @@ class TextDetector:
         self.refine = False
         self.refiner_model = ''
         self.poly = False
+        self.cuda = True
 
         self.net = CRAFT()
-        self.net.load_state_dict(copyStateDict(torch.load('CRAFT/weights/craft_mlt_25k.pth')))
-        self.net = self.net.cuda()
-        self.net = torch.nn.DataParallel(self.net)
+        if self.cuda:
+            self.net.load_state_dict(copyStateDict(torch.load('CRAFT/weights/craft_mlt_25k.pth')))
+        else:
+            self.net.load_state_dict(copyStateDict(torch.load('CRAFT/weights/craft_mlt_25k.pth', map_location='cpu')))
+
+        if self.cuda:
+            self.net = self.net.cuda()
+            self.net = torch.nn.DataParallel(self.net)
         self.net.eval()
 
         # LinkRefiner
@@ -63,9 +69,12 @@ class TextDetector:
         if self.refine:
             from refinenet import RefineNet
             self.refine_net = RefineNet()
-            self.refine_net.load_state_dict(copyStateDict(torch.load(self.refiner_model)))
-            self.refine_net = self.refine_net.cuda()
-            self.refine_net = torch.nn.DataParallel(self.refine_net)
+            if self.cuda:
+                self.refine_net.load_state_dict(copyStateDict(torch.load(self.refiner_model)))
+                self.refine_net = self.refine_net.cuda()
+                self.refine_net = torch.nn.DataParallel(self.refine_net)
+            else:
+                self.refine_net.load_state_dict(copyStateDict(torch.load(self.refiner_model, map_location='cpu')))
             self.refine_net.eval()
             self.poly = True
 
@@ -81,7 +90,8 @@ class TextDetector:
         x = torch.from_numpy(x).permute(2, 0, 1)  # [h, w, c] to [c, h, w]
         x = Variable(x.unsqueeze(0))  # [c, h, w] to [b, c, h, w]
 
-        x = x.cuda()
+        if self.cuda:
+            x = x.cuda()
 
         # forward pass
         with torch.no_grad():

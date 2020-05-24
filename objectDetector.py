@@ -19,7 +19,7 @@ class ObjectDetector:
         self.save_img = True
 
         weights = 'yolov3/weights/yolov3.pt'
-        self.device = torch_utils.select_device()
+        self.device = 'cuda'
         self.model = Darknet('yolov3/cfg/yolov3.cfg', self.img_size)
         self.model.load_state_dict(torch.load(weights, map_location=self.device)['model'])
 
@@ -63,9 +63,10 @@ class ObjectDetector:
     
         # Inference
         t1 = torch_utils.time_synchronized()
-        pred = self.model(img, augment=self.augment)[0]
+        with torch.no_grad():
+            pred = self.model(img, augment=self.augment)[0]
         t2 = torch_utils.time_synchronized()
-        print('Predict time: (%.3fs)' % (t2 - t1))
+        # print('Predict time: (%.3fs)' % (t2 - t1))
     
         # to float
         if self.half:

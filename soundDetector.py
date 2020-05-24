@@ -4,9 +4,11 @@ import tensorflow as tf
 import params
 import yamnet as yamnet_model
 
-
 class SoundDetector:
     def __init__(self):
+        physical_devices = tf.config.list_physical_devices('GPU')
+        tf.config.experimental.set_virtual_device_configuration(physical_devices[0],
+                                                                [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=4096)])
         self.graph = tf.Graph()
         with self.graph.as_default():
             self.yamnet = yamnet_model.yamnet_frames_model(params)
@@ -29,5 +31,5 @@ class SoundDetector:
         top5_i = np.argsort(prediction)[::-1][:5]
         for i in top5_i:
             toRet.append((self.yamnet_classes[i], prediction[i]))
-            print(self.yamnet_classes[i], prediction[i])
+            # print(self.yamnet_classes[i], prediction[i])
         return toRet

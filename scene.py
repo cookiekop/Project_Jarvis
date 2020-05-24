@@ -29,6 +29,28 @@ class Scene:
         # reading_vec = np.array([self.img.shape[2], self.img.shape[1]])
         # self.words.sort(key=lambda k: np.sqrt(np.sum(np.power(k.center, 2) * reading_vec)))
 
+    def save(self):
+        sce_hash = str(hash(self))
+        sce_json = '{"objs": ['
+        for j, obj in enumerate(self.objs):
+            xyxy = [int(element.item()) for element in obj.box]
+            sce_json += '{"name": "' + obj.name + '", "box": ' + str(xyxy) + \
+                        ', "conf": ' + str(float(obj.conf)) + '}'
+            if j < len(self.objs) - 1:
+                sce_json += ', '
+        sce_json += '], "words": ['
+        for j, word in enumerate(self.words):
+            # xyxy = [int(element.item()) for element in word.box]
+            sce_json += '{"str": "' + word.str + '", "box": ' + str(word.box) + \
+                        ', "conf": ' + str(float(word.conf)) + '}'
+            if j < len(self.words) - 1:
+                sce_json += ', '
+        sce_json += '] }'
+        cv2.imwrite('MemoryFiles/scene/image/' + sce_hash + '.png', self.img)
+        with open('MemoryFiles/scene/' + sce_hash + '.json', 'w') as f:
+            f.write(sce_json)
+        return sce_hash
+
 class Object:
     def __init__(self, name, box, conf):
         self.name = name
