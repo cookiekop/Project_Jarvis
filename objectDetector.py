@@ -1,4 +1,4 @@
-from scene import Object, Scene
+from clip import Object, Scene
 from yolov3.models import Darknet  # set ONNX_EXPORT in models.py
 from yolov3.utils.datasets import letterbox
 from yolov3.utils.utils import *

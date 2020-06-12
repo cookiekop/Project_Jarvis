@@ -1,8 +1,7 @@
 import cv2
 from PIL import Image
-
 from objectDetector import ObjectDetector
-from scene import Text
+from clip import Text
 from textDetector import TextDetector
 from textReader import TextReader
 

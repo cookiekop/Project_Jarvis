@@ -6,7 +6,7 @@ import yamnet as yamnet_model
 
 class SoundDetector:
     def __init__(self):
-        physical_devices = tf.config.list_physical_devices('GPU')
+        physical_devices = tf.config.experimental.list_physical_devices('GPU')
         tf.config.experimental.set_virtual_device_configuration(physical_devices[0],
                                                                 [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=4096)])
         self.graph = tf.Graph()

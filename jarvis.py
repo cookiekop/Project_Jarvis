@@ -18,14 +18,18 @@ audio = videoclip.audio.to_soundarray() * 32768.0
 if len(audio.shape) > 1:
     audio = np.mean(audio, axis=1)
 audio = audio.astype(np.int16)
-new_clip = Clip(audio)
+
 video = videoclip.without_audio()
+main_sce = None
+num_obj = 0
 for i, frame in enumerate(videoclip.iter_frames()):
     if i % CV_BOX_INTERVAL == 0:
         frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
         sce = jarvis._vision.run(frame)
-        new_clip.scenes.append(sce)
+        if num_obj < len(sce.objs):
+            main_sce = sce
 
+new_clip = Clip(main_sce, audio)
 sounds, words = jarvis._hearing.run(audio)
 new_clip.sounds = sounds
 new_clip.narative = words
